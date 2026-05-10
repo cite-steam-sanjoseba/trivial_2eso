@@ -2,7 +2,7 @@
 
 ![Logos institucionales](logo.png)
 
-# 🧠 TRIVIAL 2.º ESO
+# 🧠 TRIVIAL 2º ESO
 ### *Aprende jugando. Juega limpio.*
 
 <br/>
