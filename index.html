@@ -14,418 +14,371 @@
   </style>
 </head>
 <body class="bg-indigo-950 min-h-screen">
-  <div id="root"></div>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
 
-  <script type="text/babel">
-    const { useState, useEffect, useRef } = React;
+const BANCO = [
+  { categoria:"matematicas", pregunta:"¿Cuánto es (−3) × (−4)?", opciones:["−12","12","−7","7"], correcta:1, explicacion:"Al multiplicar dos negativos el resultado es positivo: (−3)×(−4) = 12." },
+  { categoria:"matematicas", pregunta:"¿Cuál es el resultado de 2³?", opciones:["6","8","9","5"], correcta:1, explicacion:"2³ = 2×2×2 = 8." },
+  { categoria:"matematicas", pregunta:"Si x + 5 = 12, ¿cuánto vale x?", opciones:["17","7","60","5"], correcta:1, explicacion:"Despejamos x: x = 12 − 5 = 7." },
+  { categoria:"matematicas", pregunta:"¿Qué fracción es equivalente a 3/4?", opciones:["6/9","9/12","4/6","3/8"], correcta:1, explicacion:"9/12 simplificada dividiendo por 3 da 3/4." },
+  { categoria:"matematicas", pregunta:"¿Cuántos grados tiene un ángulo recto?", opciones:["45°","90°","180°","360°"], correcta:1, explicacion:"Un ángulo recto mide exactamente 90°." },
+  { categoria:"matematicas", pregunta:"¿Cuál es el 25 % de 200?", opciones:["25","50","75","100"], correcta:1, explicacion:"25 % de 200 = 200 × 0,25 = 50." },
+  { categoria:"matematicas", pregunta:"Perímetro de un cuadrado de lado 6 cm:", opciones:["12 cm","24 cm","36 cm","6 cm"], correcta:1, explicacion:"Perímetro = 4 × lado = 4 × 6 = 24 cm." },
+  { categoria:"matematicas", pregunta:"¿Cuál es la media aritmética de 4, 6 y 8?", opciones:["5","6","7","18"], correcta:1, explicacion:"Media = (4+6+8)/3 = 18/3 = 6." },
+  { categoria:"matematicas", pregunta:"Si y = 2x + 1, ¿cuánto vale y cuando x = 3?", opciones:["5","7","8","9"], correcta:1, explicacion:"y = 2×3 + 1 = 6 + 1 = 7." },
+  { categoria:"matematicas", pregunta:"¿Cuál es el mínimo común múltiplo de 4 y 6?", opciones:["2","12","24","6"], correcta:1, explicacion:"mcm(4,6) = 12, el menor número divisible entre 4 y 6." },
+  { categoria:"matematicas", pregunta:"¿Qué triángulo tiene los tres lados iguales?", opciones:["Escaleno","Isósceles","Equilátero","Rectángulo"], correcta:2, explicacion:"El equilátero tiene tres lados y tres ángulos iguales de 60°." },
+  { categoria:"matematicas", pregunta:"¿Cuánto es (−8) + 3?", opciones:["11","−5","−11","5"], correcta:1, explicacion:"−8 + 3 = −5. El resultado tiene el signo del número con mayor valor absoluto." },
+  { categoria:"ciencias", pregunta:"¿Qué orgánulo celular produce energía?", opciones:["Núcleo","Ribosoma","Mitocondria","Vacuola"], correcta:2, explicacion:"La mitocondria produce ATP mediante la respiración celular." },
+  { categoria:"ciencias", pregunta:"¿Cuántos cromosomas tiene una célula humana normal?", opciones:["23","46","48","92"], correcta:1, explicacion:"Las células somáticas humanas tienen 46 cromosomas en 23 pares." },
+  { categoria:"ciencias", pregunta:"¿Qué tipo de reproducción no necesita dos progenitores?", opciones:["Sexual","Asexual","Vivípara","Ovípara"], correcta:1, explicacion:"La reproducción asexual genera descendencia a partir de un solo organismo." },
+  { categoria:"ciencias", pregunta:"¿Cómo fabrican su alimento las plantas?", opciones:["Respiración","Fotosíntesis","Digestión","Fermentación"], correcta:1, explicacion:"La fotosíntesis convierte luz solar, CO₂ y agua en glucosa y oxígeno." },
+  { categoria:"ciencias", pregunta:"¿Qué estructura tienen las células vegetales pero no las animales?", opciones:["Membrana","Núcleo","Pared celular","Ribosoma"], correcta:2, explicacion:"La pared celular de celulosa da rigidez a las células vegetales." },
+  { categoria:"ciencias", pregunta:"¿Cuál es el órgano principal del sistema nervioso central?", opciones:["Corazón","Pulmón","Cerebro","Riñón"], correcta:2, explicacion:"El cerebro coordina todas las funciones del cuerpo." },
+  { categoria:"ciencias", pregunta:"¿Qué tipo de roca se forma por enfriamiento del magma?", opciones:["Sedimentaria","Metamórfica","Ígnea","Caliza"], correcta:2, explicacion:"Las rocas ígneas se forman al solidificarse el magma." },
+  { categoria:"ciencias", pregunta:"¿Qué gas expulsamos principalmente al respirar?", opciones:["Oxígeno","Nitrógeno","CO₂","Vapor de agua"], correcta:2, explicacion:"Al exhalar expulsamos sobre todo dióxido de carbono (CO₂)." },
+  { categoria:"ciencias", pregunta:"¿Cómo se llama la capa más externa de la Tierra?", opciones:["Manto","Núcleo","Corteza","Astenosfera"], correcta:2, explicacion:"La corteza terrestre es la capa más superficial, sobre la que vivimos." },
+  { categoria:"ciencias", pregunta:"¿Qué son los productores en un ecosistema?", opciones:["Herbívoros","Carnívoros","Plantas y algas","Hongos"], correcta:2, explicacion:"Los productores fabrican materia orgánica mediante fotosíntesis." },
+  { categoria:"historia", pregunta:"¿En qué año cayó el Imperio Romano de Occidente?", opciones:["476","1453","711","1492"], correcta:0, explicacion:"El 476 d.C. marca el fin del Imperio Romano de Occidente e inicia la Edad Media." },
+  { categoria:"historia", pregunta:"¿Cómo se llama el sistema político propio de la Edad Media?", opciones:["Capitalismo","Feudalismo","Absolutismo","Comunismo"], correcta:1, explicacion:"El feudalismo organizaba la sociedad: el señor daba tierras a cambio de servicios." },
+  { categoria:"historia", pregunta:"¿En qué año llegaron los musulmanes a la Península Ibérica?", opciones:["476","711","1492","1212"], correcta:1, explicacion:"En 711 las tropas musulmanas cruzaron el Estrecho de Gibraltar." },
+  { categoria:"historia", pregunta:"¿Qué ciudad fue capital del Califato de Córdoba?", opciones:["Toledo","Sevilla","Granada","Córdoba"], correcta:3, explicacion:"Córdoba fue una de las ciudades más importantes de Europa medieval." },
+  { categoria:"historia", pregunta:"¿En qué año terminó la Reconquista con la toma de Granada?", opciones:["1212","1469","1492","1516"], correcta:2, explicacion:"El 2 de enero de 1492 los Reyes Católicos tomaron Granada." },
+  { categoria:"historia", pregunta:"¿Quiénes eran los Reyes Católicos?", opciones:["Carlos I y Juana","Fernando e Isabel","Alfonso X y Berenguela","Felipe II y María"], correcta:1, explicacion:"Fernando II de Aragón e Isabel I de Castilla unieron sus coronas." },
+  { categoria:"historia", pregunta:"¿Qué era un gremio medieval?", opciones:["Un impuesto","Una asociación de artesanos","Un tipo de castillo","Un cargo religioso"], correcta:1, explicacion:"Los gremios asociaban artesanos del mismo oficio para regular la producción." },
+  { categoria:"historia", pregunta:"¿Qué documento de 1215 limitó el poder del rey en Inglaterra?", opciones:["Constitución","Carta Magna","Fuero Juzgo","Edicto de Milán"], correcta:1, explicacion:"La Carta Magna reconoció derechos de los nobles frente al rey Juan Sin Tierra." },
+  { categoria:"historia", pregunta:"¿Cómo se llamaba el proceso de recuperación cristiana de la Península?", opciones:["Cruzada","Reconquista","Reforma","Inquisición"], correcta:1, explicacion:"La Reconquista duró del siglo VIII al XV y culminó en 1492." },
+  { categoria:"historia", pregunta:"¿Qué es un vasallo en el sistema feudal?", opciones:["Un siervo sin tierras","Quien recibe tierras a cambio de fidelidad","El rey","Un mercader"], correcta:1, explicacion:"El vasallo juraba fidelidad al señor a cambio de protección y tierras." },
+  { categoria:"geografia", pregunta:"¿Qué cadena montañosa separa España de Francia?", opciones:["Sistema Central","Pirineos","Cordillera Cantábrica","Sierra Nevada"], correcta:1, explicacion:"Los Pirineos forman una frontera natural de 430 km entre España y Francia." },
+  { categoria:"geografia", pregunta:"¿Cuál es el río más largo de la Península Ibérica?", opciones:["Ebro","Duero","Tajo","Guadalquivir"], correcta:2, explicacion:"El Tajo con 1.007 km es el más largo; desemboca en Lisboa." },
+  { categoria:"geografia", pregunta:"¿En qué mar desemboca el río Ebro?", opciones:["Atlántico","Mediterráneo","Cantábrico","Adriático"], correcta:1, explicacion:"El Ebro desemboca en el Mediterráneo formando un delta en Tarragona." },
+  { categoria:"geografia", pregunta:"¿Cuál es la capital de Extremadura?", opciones:["Badajoz","Mérida","Cáceres","Plasencia"], correcta:1, explicacion:"Mérida es la capital de Extremadura desde 1983." },
+  { categoria:"geografia", pregunta:"¿En qué océano están las Islas Canarias?", opciones:["Índico","Ártico","Atlántico","Pacífico"], correcta:2, explicacion:"Las Canarias están en el Atlántico, frente a la costa noroeste de África." },
+  { categoria:"geografia", pregunta:"¿Cuántas comunidades autónomas tiene España?", opciones:["15","17","19","21"], correcta:1, explicacion:"España tiene 17 comunidades autónomas y 2 ciudades autónomas." },
+  { categoria:"geografia", pregunta:"¿Cuál es el pico más alto de la España peninsular?", opciones:["Teide","Mulhacén","Aneto","Almanzor"], correcta:1, explicacion:"El Mulhacén (3.479 m) en Sierra Nevada es el más alto peninsular." },
+  { categoria:"geografia", pregunta:"¿Qué comunidad autónoma tiene mayor superficie?", opciones:["Cataluña","Andalucía","Castilla y León","Extremadura"], correcta:2, explicacion:"Castilla y León es la más extensa con 94.226 km²." },
+  { categoria:"geografia", pregunta:"¿Qué tipo de clima predomina en el interior de España?", opciones:["Oceánico","Mediterráneo","Continental","Árido"], correcta:2, explicacion:"El clima continental tiene veranos calurosos e inviernos muy fríos." },
+  { categoria:"geografia", pregunta:"¿Qué río recorre Extremadura y desemboca en Portugal?", opciones:["Tajo","Guadiana","Ebro","Duero"], correcta:1, explicacion:"El Guadiana recorre Extremadura antes de desembocar en el Atlántico." },
+  { categoria:"lengua", pregunta:"¿Qué tipo de palabra es 'rápidamente'?", opciones:["Adjetivo","Adverbio","Sustantivo","Verbo"], correcta:1, explicacion:"Los adverbios modifican al verbo, adjetivo u otro adverbio." },
+  { categoria:"lengua", pregunta:"¿Cuál es la obra más famosa de Cervantes?", opciones:["La Celestina","El Quijote","El Lazarillo","La Odisea"], correcta:1, explicacion:"Don Quijote de la Mancha (1605) es considerada la primera novela moderna." },
+  { categoria:"lengua", pregunta:"¿Cuántas sílabas tiene 'es-tu-dian-te'?", opciones:["3","4","5","2"], correcta:1, explicacion:"Es-tu-dian-te tiene 4 sílabas." },
+  { categoria:"lengua", pregunta:"¿Qué recurso literario compara dos elementos usando 'como'?", opciones:["Metáfora","Hipérbole","Símil","Personificación"], correcta:2, explicacion:"El símil une dos elementos con nexos como 'como', 'igual que'." },
+  { categoria:"lengua", pregunta:"¿En qué siglo se escribió el Cantar de Mio Cid?", opciones:["VIII","XII","XV","XVII"], correcta:1, explicacion:"El Cantar de Mio Cid data del siglo XII, primer texto épico castellano." },
+  { categoria:"lengua", pregunta:"¿Qué narrador lo sabe todo sobre los personajes?", opciones:["Testigo","Omnisciente","Protagonista","Externo"], correcta:1, explicacion:"El narrador omnisciente conoce pensamientos y sentimientos de todos." },
+  { categoria:"lengua", pregunta:"¿Cómo se llaman las palabras de significado opuesto?", opciones:["Sinónimos","Antónimos","Homónimos","Parónimos"], correcta:1, explicacion:"Antónimos: palabras de significado contrario. Frío ↔ caliente." },
+  { categoria:"lengua", pregunta:"¿Cuántos versos tiene un soneto?", opciones:["10","12","14","16"], correcta:2, explicacion:"El soneto tiene 14 versos: dos cuartetos y dos tercetos." },
+  { categoria:"lengua", pregunta:"¿Qué es una oración subordinada?", opciones:["Una oración independiente","Una oración que depende de la principal","Una oración sin verbo","Una con dos sujetos"], correcta:1, explicacion:"La subordinada depende de la principal y no tiene sentido completo sola." },
+  { categoria:"lengua", pregunta:"¿Qué figura atribuye cualidades humanas a objetos?", opciones:["Metáfora","Hipérbole","Símil","Personificación"], correcta:3, explicacion:"La personificación atribuye rasgos humanos a seres inanimados." },
+  { categoria:"ingles", pregunta:"¿Cómo se dice 'biblioteca' en inglés?", opciones:["Bookstore","Library","Laboratory","Gymnasium"], correcta:1, explicacion:"'Library' es la biblioteca. 'Bookstore' es donde se venden libros." },
+  { categoria:"ingles", pregunta:"¿Cuál es el pasado simple de 'go'?", opciones:["Goed","Goes","Gone","Went"], correcta:3, explicacion:"'Go' es irregular. Pasado simple: 'went'. Participio: 'gone'." },
+  { categoria:"ingles", pregunta:"¿Qué significa 'although'?", opciones:["Por lo tanto","Sin embargo","Aunque","Porque"], correcta:2, explicacion:"'Although' significa 'aunque' o 'a pesar de que'." },
+  { categoria:"ingles", pregunta:"¿Cómo se forma el plural de 'city'?", opciones:["Citys","Cities","Cityes","City"], correcta:1, explicacion:"Consonante + y → ies en plural: city → cities." },
+  { categoria:"ingles", pregunta:"¿Qué tiempo verbal es 'She has eaten'?", opciones:["Simple past","Present perfect","Past continuous","Future"], correcta:1, explicacion:"Present perfect = have/has + participio. Conecta pasado con presente." },
+  { categoria:"ingles", pregunta:"¿Qué significa 'however'?", opciones:["Además","Por ejemplo","Sin embargo","Por lo tanto"], correcta:2, explicacion:"'However' = 'sin embargo', 'no obstante'." },
+  { categoria:"ingles", pregunta:"¿Cómo se dice 'ayer' en inglés?", opciones:["Today","Tomorrow","Yesterday","Last"], correcta:2, explicacion:"Yesterday = ayer. Today = hoy. Tomorrow = mañana." },
+  { categoria:"ingles", pregunta:"¿Cuál es el comparativo de 'good'?", opciones:["Gooder","More good","Better","Best"], correcta:2, explicacion:"'Good' es irregular: comparativo 'better', superlativo 'best'." },
+  { categoria:"ingles", pregunta:"¿Qué significa 'It's raining cats and dogs'?", opciones:["Hay gatos y perros","Llueve a cántaros","Hace mal tiempo","Los animales salen"], correcta:1, explicacion:"Modismo inglés equivalente a 'llueve a cántaros'." },
+  { categoria:"ingles", pregunta:"¿Cuál es la traducción de 'I wish I could fly'?", opciones:["Ojalá pudiera volar","Puedo volar","Quiero volar","Me gusta volar"], correcta:0, explicacion:"'I wish + could' expresa deseo irreal en presente." },
+  { categoria:"tecnologia", pregunta:"¿Cuántos bits tiene un byte?", opciones:["2","4","8","16"], correcta:2, explicacion:"Un byte = 8 bits. El bit es la unidad mínima de información (0 o 1)." },
+  { categoria:"tecnologia", pregunta:"¿Qué material conduce bien la electricidad?", opciones:["Madera","Plástico","Cobre","Vidrio"], correcta:2, explicacion:"El cobre es excelente conductor, por eso se usa en cables." },
+  { categoria:"tecnologia", pregunta:"¿Qué significa CPU?", opciones:["Central Power Unit","Central Processing Unit","Computer Processing Unit","Core Power Unit"], correcta:1, explicacion:"CPU (Unidad Central de Procesamiento) es el 'cerebro' del ordenador." },
+  { categoria:"tecnologia", pregunta:"¿Qué herramienta mide la tensión eléctrica?", opciones:["Amperímetro","Ohmímetro","Voltímetro","Termómetro"], correcta:2, explicacion:"El voltímetro mide el voltaje y se conecta en paralelo." },
+  { categoria:"tecnologia", pregunta:"¿Cuál es la unidad de la resistencia eléctrica?", opciones:["Amperio","Voltio","Vatio","Ohmio"], correcta:3, explicacion:"La resistencia se mide en ohmios (Ω)." },
+  { categoria:"tecnologia", pregunta:"¿Qué tipo de palanca es una tijera?", opciones:["Primer grado","Segundo grado","Tercer grado","No es palanca"], correcta:0, explicacion:"Palanca 1.er grado: el apoyo está entre la fuerza y la resistencia." },
+  { categoria:"tecnologia", pregunta:"¿Qué material es aislante eléctrico?", opciones:["Hierro","Aluminio","Plástico","Cobre"], correcta:2, explicacion:"El plástico no conduce electricidad; por eso recubre los cables." },
+  { categoria:"tecnologia", pregunta:"¿Cuál es la función de un fusible?", opciones:["Aumentar la tensión","Almacenar energía","Proteger el circuito de sobrecargas","Transformar la corriente"], correcta:2, explicacion:"El fusible se funde con exceso de corriente, protegiendo el circuito." },
+  { categoria:"tecnologia", pregunta:"¿Qué significa 'open source'?", opciones:["Software de pago","Software de código abierto","Software antiguo","Software sin actualizaciones"], correcta:1, explicacion:"El software libre permite ver, modificar y distribuir su código fuente." },
+  { categoria:"tecnologia", pregunta:"En serie, si una bombilla se funde...", opciones:["Las demás siguen","Todas se apagan","Solo la siguiente","Aumenta la intensidad"], correcta:1, explicacion:"En serie hay un camino único; si se corta en un punto, se apaga todo." },
+  { categoria:"arte", pregunta:"¿Quién pintó 'La Gioconda'?", opciones:["Miguel Ángel","Rafael","Leonardo da Vinci","Botticelli"], correcta:2, explicacion:"Leonardo da Vinci pintó La Gioconda hacia 1503-1519." },
+  { categoria:"arte", pregunta:"¿Cuántas notas tiene la escala musical?", opciones:["5","6","7","8"], correcta:2, explicacion:"La escala tiene 7 notas: do, re, mi, fa, sol, la, si." },
+  { categoria:"arte", pregunta:"¿Qué es un fresco?", opciones:["Una escultura","Pintura sobre yeso húmedo","Un grabado","Un estilo arquitectónico"], correcta:1, explicacion:"El fresco consiste en pintar sobre yeso todavía húmedo." },
+  { categoria:"arte", pregunta:"¿Cuántos tiempos tiene un compás de 4/4?", opciones:["2","3","4","6"], correcta:2, explicacion:"El compás de 4/4 tiene 4 tiempos; es el más común en música occidental." },
+  { categoria:"arte", pregunta:"¿Qué construyeron los romanos para transportar agua?", opciones:["Castillo","Acueducto","Catedral","Foro"], correcta:1, explicacion:"Los acueductos llevaban agua desde fuentes lejanas hasta las ciudades." },
+  { categoria:"arte", pregunta:"¿Cómo se llama la voz masculina más grave?", opciones:["Tenor","Barítono","Bajo","Contratenor"], correcta:2, explicacion:"El bajo es la voz masculina más grave, seguida de barítono y tenor." },
+  { categoria:"arte", pregunta:"¿Qué instrumento es de cuerda?", opciones:["Flauta","Trompeta","Violín","Tambor"], correcta:2, explicacion:"El violín es de cuerda frotada. Flauta = viento, trompeta = viento-metal." },
+  { categoria:"arte", pregunta:"¿Qué estilo medieval usa arcos ojivales y vidrieras?", opciones:["Románico","Gótico","Barroco","Neoclásico"], correcta:1, explicacion:"El gótico (ss. XII-XV) tiene arcos apuntados, vidrieras y verticalidad." },
+  { categoria:"arte", pregunta:"¿Quién esculpió 'El David'?", opciones:["Leonardo","Rafael","Donatello","Miguel Ángel"], correcta:3, explicacion:"Miguel Ángel esculpió El David entre 1501 y 1504." },
+  { categoria:"arte", pregunta:"¿Qué pintor español pintó 'Las Meninas'?", opciones:["Goya","El Greco","Velázquez","Murillo"], correcta:2, explicacion:"Velázquez pintó Las Meninas en 1656, obra maestra del Siglo de Oro." },
+];
 
-    // ─────────────────────────────────────────────────────────────
-    // CONFIGURACIÓN
-    // Opción A: deja API_KEY vacío → el profesor la introduce la
-    //           primera vez y queda guardada en el navegador.
-    // Opción B: pon tu clave aquí para que vaya directamente
-    //           (solo en repositorios PRIVADOS).
-    // ─────────────────────────────────────────────────────────────
-    const API_KEY_FIJA = "";
+const CATEGORIAS = [
+  { id:"matematicas",  label:"Matemáticas",        emoji:"🔢" },
+  { id:"ciencias",     label:"Ciencias Naturales",  emoji:"🌿" },
+  { id:"historia",     label:"Historia",            emoji:"🏛️" },
+  { id:"geografia",    label:"Geografía",           emoji:"🌍" },
+  { id:"lengua",       label:"Lengua y Literatura", emoji:"📖" },
+  { id:"ingles",       label:"Inglés",              emoji:"🇬🇧" },
+  { id:"tecnologia",   label:"Tecnología",          emoji:"⚙️"  },
+  { id:"arte",         label:"Arte y Música",       emoji:"🎨" },
+];
 
-    // ── Logos: reemplaza con tus imágenes reales ─────────────────
-    // Ejemplo: <img src="logos/innovated.png" alt="INNOVATED" className="h-10" />
-    // Sube tus logos a una carpeta /logos en el repo y ajusta las rutas.
+const COLORES = {
+  matematicas:"from-blue-500 to-blue-700",   ciencias:"from-green-500 to-green-700",
+  historia:   "from-amber-500 to-amber-700", geografia:"from-teal-500 to-teal-700",
+  lengua:     "from-purple-500 to-purple-700", ingles:"from-red-500 to-red-700",
+  tecnologia: "from-gray-500 to-gray-700",   arte:"from-pink-500 to-pink-700",
+};
 
-    const CATEGORIAS = [
-      { id: "matematicas",  label: "Matemáticas",        emoji: "🔢" },
-      { id: "ciencias",     label: "Ciencias Naturales",  emoji: "🌿" },
-      { id: "historia",     label: "Historia",            emoji: "🏛️" },
-      { id: "geografia",    label: "Geografía",           emoji: "🌍" },
-      { id: "lengua",       label: "Lengua y Literatura", emoji: "📖" },
-      { id: "ingles",       label: "Inglés",              emoji: "🇬🇧" },
-      { id: "tecnologia",   label: "Tecnología",          emoji: "⚙️"  },
-      { id: "arte",         label: "Arte y Música",       emoji: "🎨" },
-    ];
+const shuffle = a => [...a].sort(()=>Math.random()-0.5);
 
-    const COLORES = {
-      matematicas: "from-blue-500 to-blue-700",
-      ciencias:    "from-green-500 to-green-700",
-      historia:    "from-amber-500 to-amber-700",
-      geografia:   "from-teal-500 to-teal-700",
-      lengua:      "from-purple-500 to-purple-700",
-      ingles:      "from-red-500 to-red-700",
-      tecnologia:  "from-gray-500 to-gray-700",
-      arte:        "from-pink-500 to-pink-700",
-    };
+function LogosHeader() {
+  return (
+    <div className="flex justify-center mb-4">
+      <img src="logo.png" alt="Logos institucionales" className="max-h-20 w-auto" />
+    </div>
+  );
+}
 
-    // ── Componentes de logos ─────────────────────────────────────
-    function LogosHeader() {
-      return (
-        <div className="flex justify-center mb-4">
-          <img src="logo.png" alt="Logos institucionales" className="max-h-20 w-auto" />
+function LogosFooter() {
+  return (
+    <footer className="text-center text-indigo-400 text-xs mt-6 pb-4 border-t border-indigo-800 pt-3">
+      <p className="font-semibold text-indigo-300">Cristina Ramos García · 2026</p>
+      <p className="mt-0.5">Proyecto CITE-STEAM · IA-FP Robótica Inclusiva · IES San José, Badajoz</p>
+    </footer>
+  );
+}
+
+function TimerCircle({ segundos, total }) {
+  const r=22, circ=2*Math.PI*r, pct=segundos/total;
+  const color = pct>0.5?"#facc15":pct>0.25?"#f97316":"#ef4444";
+  return (
+    <svg width="60" height="60" viewBox="0 0 60 60">
+      <circle cx="30" cy="30" r={r} fill="none" stroke="#312e81" strokeWidth="5"/>
+      <circle cx="30" cy="30" r={r} fill="none" stroke={color} strokeWidth="5"
+        strokeDasharray={circ} strokeDashoffset={circ*(1-pct)}
+        strokeLinecap="round" transform="rotate(-90 30 30)"
+        style={{transition:"stroke-dashoffset 0.9s linear,stroke 0.3s"}}/>
+      <text x="30" y="35" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">{segundos}</text>
+    </svg>
+  );
+}
+
+function Trivial() {
+  const [estado,      setEstado]    = useState("inicio");
+  const [seleccionadas, setSel]     = useState([]);
+  const [numPreguntas,  setNum]     = useState(10);
+  const [timerActivo,   setTimer]   = useState(false);
+  const [timerSeg,      setTimerSeg]= useState(20);
+  const [tiempoRestante,setTiempo]  = useState(20);
+  const [preguntas,   setPreguntas] = useState([]);
+  const [actual,      setActual]    = useState(0);
+  const [respuesta,   setRespuesta] = useState(null);
+  const [mostrarResp, setMostrar]   = useState(false);
+  const [puntuacion,  setPuntos]    = useState(0);
+  const [historial,   setHistorial] = useState([]);
+  const [error,       setError]     = useState("");
+  const intervaloRef = useRef(null);
+
+  useEffect(()=>{
+    if(estado!=="jugando"||mostrarResp||!timerActivo) return;
+    setTiempo(timerSeg);
+    intervaloRef.current = setInterval(()=>{
+      setTiempo(t=>{
+        if(t<=1){ clearInterval(intervaloRef.current); setMostrar(true); setRespuesta(r=>r===null?-1:r); return 0; }
+        return t-1;
+      });
+    },1000);
+    return ()=>clearInterval(intervaloRef.current);
+  },[actual,estado,mostrarResp]);
+
+  const toggleCat = id => setSel(p=>p.includes(id)?p.filter(c=>c!==id):[...p,id]);
+
+  const iniciarJuego = () => {
+    if(!seleccionadas.length){ setError("¡Elige al menos una categoría!"); return; }
+    const pool = shuffle(BANCO.filter(q=>seleccionadas.includes(q.categoria)));
+    if(pool.length < numPreguntas){ setError(`Solo hay ${pool.length} preguntas para esa selección. Reduce el número o añade categorías.`); return; }
+    setPreguntas(pool.slice(0,numPreguntas));
+    setActual(0); setPuntos(0); setHistorial([]);
+    setRespuesta(null); setMostrar(false); setError("");
+    setEstado("jugando");
+  };
+
+  const comprobar = () => {
+    if(respuesta===null){ setError("Selecciona una respuesta."); return; }
+    setError("");
+    if(!mostrarResp){ clearInterval(intervaloRef.current); setMostrar(true); return; }
+    const ok = respuesta===preguntas[actual].correcta;
+    setHistorial(h=>[...h,{respuesta,correcta:ok}]);
+    if(ok) setPuntos(p=>p+1);
+    if(actual+1<preguntas.length){ setActual(a=>a+1); setRespuesta(null); setMostrar(false); }
+    else setEstado("resultados");
+  };
+
+  const reiniciar = () => {
+    clearInterval(intervaloRef.current);
+    setEstado("inicio"); setPreguntas([]); setActual(0);
+    setPuntos(0); setHistorial([]); setRespuesta(null); setMostrar(false); setError("");
+  };
+
+  if(estado==="inicio") return (
+    <div className="min-h-screen bg-indigo-950 text-white p-4">
+      <div className="max-w-2xl mx-auto">
+        <LogosHeader/>
+        <div className="text-center py-4">
+          <div className="text-5xl mb-1">🧠</div>
+          <h1 className="text-4xl font-black text-yellow-300 mb-0.5">TRIVIAL</h1>
+          <p className="text-indigo-300 font-semibold">2.º ESO · ¿Cuánto sabes?</p>
         </div>
-      );
-    }
-
-    function LogosFooter() {
-      return (
-        <footer className="text-center text-indigo-400 text-xs mt-6 pb-4 border-t border-indigo-800 pt-3">
-          <p className="font-semibold text-indigo-300">Cristina Ramos García · 2026</p>
-          <p className="mt-0.5">Proyecto CITE-STEAM · IA-FP Robótica Inclusiva · IES San José, Badajoz</p>
-        </footer>
-      );
-    }
-
-    // ── Timer circular ────────────────────────────────────────────
-    function TimerCircle({ segundos, total }) {
-      const r = 22, circ = 2 * Math.PI * r;
-      const pct = segundos / total;
-      const color = pct > 0.5 ? "#facc15" : pct > 0.25 ? "#f97316" : "#ef4444";
-      return (
-        <svg width="60" height="60" viewBox="0 0 60 60">
-          <circle cx="30" cy="30" r={r} fill="none" stroke="#312e81" strokeWidth="5"/>
-          <circle cx="30" cy="30" r={r} fill="none" stroke={color} strokeWidth="5"
-            strokeDasharray={circ} strokeDashoffset={circ*(1-pct)}
-            strokeLinecap="round" transform="rotate(-90 30 30)"
-            style={{transition:"stroke-dashoffset 0.9s linear,stroke 0.3s"}}/>
-          <text x="30" y="35" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">{segundos}</text>
-        </svg>
-      );
-    }
-
-    // ── Pantalla introducción clave API ───────────────────────────
-    function PantallaApiKey({ onGuardar }) {
-      const [key, setKey] = useState("");
-      return (
-        <div className="min-h-screen bg-indigo-950 flex items-center justify-center p-4">
-          <div className="bg-indigo-900 rounded-2xl p-8 max-w-md w-full border border-indigo-700 text-white text-center">
-            <div className="text-5xl mb-3">🔑</div>
-            <h2 className="text-2xl font-black text-yellow-300 mb-2">Clave API de Anthropic</h2>
-            <p className="text-indigo-300 text-sm mb-5">
-              Necesaria para generar las preguntas con IA.<br/>
-              Se guarda solo en este navegador.
-            </p>
-            <input
-              type="password"
-              value={key}
-              onChange={e => setKey(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && key.trim() && onGuardar(key.trim())}
-              placeholder="sk-ant-..."
-              className="w-full bg-indigo-800 border-2 border-indigo-600 rounded-xl px-4 py-3 text-white placeholder-indigo-400 mb-4 focus:outline-none focus:border-yellow-400"
-            />
-            <button
-              onClick={() => key.trim() && onGuardar(key.trim())}
-              className="w-full bg-yellow-400 hover:bg-yellow-300 text-indigo-950 font-black py-3 rounded-xl transition-all">
-              Guardar y continuar →
-            </button>
-            <p className="text-indigo-500 text-xs mt-4">
-              Obtén tu clave en <a href="https://console.anthropic.com" target="_blank" className="underline text-indigo-400">console.anthropic.com</a>
-            </p>
+        <div className="bg-indigo-900 rounded-2xl p-5 mb-4 border border-indigo-700">
+          <h2 className="text-lg font-bold text-yellow-300 mb-3">📚 Elige las materias</h2>
+          <div className="grid grid-cols-2 gap-2">
+            {CATEGORIAS.map(cat=>(
+              <button key={cat.id} onClick={()=>toggleCat(cat.id)}
+                className={`flex items-center gap-2 p-3 rounded-xl font-semibold text-sm transition-all border-2 ${
+                  seleccionadas.includes(cat.id)?"bg-yellow-400 text-indigo-950 border-yellow-300":"bg-indigo-800 text-white border-indigo-600 hover:border-yellow-400"}`}>
+                <span className="text-xl">{cat.emoji}</span><span>{cat.label}</span>
+              </button>
+            ))}
           </div>
         </div>
-      );
-    }
-
-    // ── App principal ─────────────────────────────────────────────
-    function Trivial() {
-      const [apiKey, setApiKey]             = useState(() => localStorage.getItem("trivial_eso_apikey") || API_KEY_FIJA);
-      const [estado, setEstado]             = useState("inicio");
-      const [seleccionadas, setSeleccionadas] = useState([]);
-      const [numPreguntas, setNumPreguntas] = useState(10);
-      const [timerActivo, setTimerActivo]   = useState(false);
-      const [timerSeg, setTimerSeg]         = useState(20);
-      const [tiempoRestante, setTiempoRestante] = useState(20);
-      const [preguntas, setPreguntas]       = useState([]);
-      const [actual, setActual]             = useState(0);
-      const [respuesta, setRespuesta]       = useState(null);
-      const [mostrarResp, setMostrarResp]   = useState(false);
-      const [puntuacion, setPuntuacion]     = useState(0);
-      const [historial, setHistorial]       = useState([]);
-      const [error, setError]               = useState("");
-      const intervaloRef                    = useRef(null);
-
-      const guardarKey = (k) => { localStorage.setItem("trivial_eso_apikey", k); setApiKey(k); };
-      const borrarKey  = ()  => { localStorage.removeItem("trivial_eso_apikey"); setApiKey(""); };
-
-      // Timer
-      useEffect(() => {
-        if (estado !== "jugando" || mostrarResp || !timerActivo) return;
-        setTiempoRestante(timerSeg);
-        intervaloRef.current = setInterval(() => {
-          setTiempoRestante(t => {
-            if (t <= 1) {
-              clearInterval(intervaloRef.current);
-              setMostrarResp(true);
-              setRespuesta(r => r === null ? -1 : r);
-              return 0;
-            }
-            return t - 1;
-          });
-        }, 1000);
-        return () => clearInterval(intervaloRef.current);
-      }, [actual, estado, mostrarResp]);
-
-      if (!apiKey) return <PantallaApiKey onGuardar={guardarKey} />;
-
-      const toggleCat = id => setSeleccionadas(p => p.includes(id) ? p.filter(c=>c!==id) : [...p,id]);
-
-      const iniciarJuego = async () => {
-        if (!seleccionadas.length) { setError("¡Elige al menos una categoría!"); return; }
-        setError(""); setEstado("cargando");
-        const nombres = seleccionadas.map(id => CATEGORIAS.find(c=>c.id===id).label).join(", ");
-        const prompt = `Eres un profesor de 2º de ESO en España. Genera exactamente ${numPreguntas} preguntas de trivial para alumnos de 13-14 años.
-Categorías (repártelas equilibradamente): ${nombres}.
-NIVEL: adecuado para 2º ESO, vocabulario sencillo, conceptos del currículo oficial español.
-Responde ÚNICAMENTE con un objeto JSON válido, sin texto adicional ni bloques de código markdown:
-{"preguntas":[{"pregunta":"...","opciones":["A","B","C","D"],"correcta":0,"categoria":"matematicas","explicacion":"..."}]}
-Reglas estrictas:
-- "categoria" debe ser exactamente uno de: ${seleccionadas.join(", ")}
-- "correcta" es el índice 0-3 de la opción correcta
-- Las 4 opciones deben ser plausibles
-- "explicacion" es 1-2 frases educativas breves
-- Todo en español`;
-        try {
-          const res = await fetch("https://api.anthropic.com/v1/messages", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "x-api-key": apiKey,
-              "anthropic-version": "2023-06-01",
-              "anthropic-dangerous-direct-browser-access": "true"
-            },
-            body: JSON.stringify({
-              model: "claude-sonnet-4-20250514",
-              max_tokens: 4000,
-              messages: [{ role: "user", content: prompt }]
-            })
-          });
-          const data = await res.json();
-          if (data.error) throw new Error(data.error.message);
-          const texto  = data.content.map(b=>b.text||"").join("");
-          const parsed = JSON.parse(texto.replace(/```json|```/g,"").trim());
-          setPreguntas(parsed.preguntas);
-          setActual(0); setPuntuacion(0); setHistorial([]);
-          setRespuesta(null); setMostrarResp(false);
-          setEstado("jugando");
-        } catch(e) {
-          setEstado("inicio");
-          setError("Error: " + e.message);
-        }
-      };
-
-      const comprobar = () => {
-        if (respuesta === null) { setError("Selecciona una respuesta."); return; }
-        setError("");
-        if (!mostrarResp) { clearInterval(intervaloRef.current); setMostrarResp(true); return; }
-        const ok = respuesta === preguntas[actual].correcta;
-        const nuevo = [...historial, { respuesta, correcta: ok }];
-        setHistorial(nuevo);
-        if (ok) setPuntuacion(p=>p+1);
-        if (actual+1 < preguntas.length) {
-          setActual(a=>a+1); setRespuesta(null); setMostrarResp(false);
-        } else { setEstado("resultados"); }
-      };
-
-      const reiniciar = () => {
-        clearInterval(intervaloRef.current);
-        setEstado("inicio"); setPreguntas([]); setActual(0);
-        setPuntuacion(0); setHistorial([]); setRespuesta(null); setMostrarResp(false); setError("");
-      };
-
-      // ── PANTALLA INICIO ────────────────────────────────────────
-      if (estado === "inicio") return (
-        <div className="min-h-screen bg-indigo-950 text-white p-4">
-          <div className="max-w-2xl mx-auto">
-            <LogosHeader />
-            <div className="text-center py-4">
-              <div className="text-5xl mb-1">🧠</div>
-              <h1 className="text-4xl font-black text-yellow-300 mb-0.5">TRIVIAL</h1>
-              <p className="text-indigo-300 font-semibold">2.º ESO · ¿Cuánto sabes?</p>
+        <div className="bg-indigo-900 rounded-2xl p-5 mb-4 border border-indigo-700">
+          <h2 className="text-lg font-bold text-yellow-300 mb-3">🔢 Número de preguntas</h2>
+          <div className="flex gap-3">
+            {[5,10,15,20].map(n=>(
+              <button key={n} onClick={()=>setNum(n)}
+                className={`flex-1 py-3 rounded-xl font-bold text-lg transition-all border-2 ${
+                  numPreguntas===n?"bg-yellow-400 text-indigo-950 border-yellow-300":"bg-indigo-800 text-white border-indigo-600 hover:border-yellow-400"}`}>{n}</button>
+            ))}
+          </div>
+        </div>
+        <div className="bg-indigo-900 rounded-2xl p-5 mb-4 border border-indigo-700">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-bold text-yellow-300">⏱️ Temporizador <span className="text-indigo-400 text-sm font-normal">(opcional)</span></h2>
+            <button onClick={()=>setTimer(t=>!t)}
+              className={`w-14 h-7 rounded-full transition-all relative border-2 ${timerActivo?"bg-yellow-400 border-yellow-300":"bg-indigo-700 border-indigo-500"}`}>
+              <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${timerActivo?"left-7":"left-0.5"}`}/>
+            </button>
+          </div>
+          {timerActivo&&(
+            <div>
+              <p className="text-indigo-300 text-sm mb-2">Segundos por pregunta: <span className="text-yellow-300 font-bold">{timerSeg}s</span></p>
+              <input type="range" min="10" max="60" step="5" value={timerSeg} onChange={e=>setTimerSeg(Number(e.target.value))}/>
+              <div className="flex justify-between text-xs text-indigo-400 mt-1"><span>10s</span><span>60s</span></div>
             </div>
+          )}
+        </div>
+        {error&&<p className="text-red-400 text-center font-semibold mb-3">{error}</p>}
+        <button onClick={iniciarJuego}
+          className="w-full bg-yellow-400 hover:bg-yellow-300 text-indigo-950 font-black py-4 rounded-2xl text-xl shadow-xl transition-all">
+          ¡JUGAR! 🚀
+        </button>
+        <LogosFooter/>
+      </div>
+    </div>
+  );
 
-            <div className="bg-indigo-900 rounded-2xl p-5 mb-4 border border-indigo-700">
-              <h2 className="text-lg font-bold text-yellow-300 mb-3">📚 Elige las materias</h2>
-              <div className="grid grid-cols-2 gap-2">
-                {CATEGORIAS.map(cat => (
-                  <button key={cat.id} onClick={()=>toggleCat(cat.id)}
-                    className={`flex items-center gap-2 p-3 rounded-xl font-semibold text-sm transition-all border-2 ${
-                      seleccionadas.includes(cat.id)
-                        ? "bg-yellow-400 text-indigo-950 border-yellow-300"
-                        : "bg-indigo-800 text-white border-indigo-600 hover:border-yellow-400"}`}>
-                    <span className="text-xl">{cat.emoji}</span><span>{cat.label}</span>
-                  </button>
-                ))}
+  if(estado==="jugando"){
+    const q=preguntas[actual];
+    const cat=CATEGORIAS.find(c=>c.id===q.categoria)||{emoji:"❓",label:q.categoria};
+    const grad=COLORES[q.categoria]||"from-indigo-500 to-indigo-700";
+    const agotado=timerActivo&&tiempoRestante===0;
+    return (
+      <div className="min-h-screen bg-indigo-950 text-white p-4">
+        <div className="max-w-2xl mx-auto">
+          <div className="flex justify-between items-center mb-2 text-sm font-bold text-indigo-300">
+            <span>Pregunta {actual+1} / {preguntas.length}</span>
+            <span className="text-yellow-300">⭐ {puntuacion}</span>
+          </div>
+          <div className="w-full bg-indigo-800 rounded-full h-3 mb-4">
+            <div className="bg-yellow-400 h-3 rounded-full transition-all" style={{width:`${(actual/preguntas.length)*100}%`}}/>
+          </div>
+          <div className={`bg-gradient-to-br ${grad} rounded-2xl p-5 mb-4 shadow-xl`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">{cat.emoji}</span>
+                <span className="text-sm font-bold opacity-90">{cat.label}</span>
               </div>
+              {timerActivo&&!mostrarResp&&<TimerCircle segundos={tiempoRestante} total={timerSeg}/>}
             </div>
-
-            <div className="bg-indigo-900 rounded-2xl p-5 mb-4 border border-indigo-700">
-              <h2 className="text-lg font-bold text-yellow-300 mb-3">🔢 Número de preguntas</h2>
-              <div className="flex gap-3">
-                {[5,10,15,20].map(n => (
-                  <button key={n} onClick={()=>setNumPreguntas(n)}
-                    className={`flex-1 py-3 rounded-xl font-bold text-lg transition-all border-2 ${
-                      numPreguntas===n ? "bg-yellow-400 text-indigo-950 border-yellow-300" : "bg-indigo-800 text-white border-indigo-600 hover:border-yellow-400"}`}>{n}</button>
-                ))}
-              </div>
+            <p className="text-xl font-bold leading-snug mt-3">{q.pregunta}</p>
+          </div>
+          {agotado&&!mostrarResp&&(
+            <div className="bg-red-900 border border-red-500 rounded-xl p-3 mb-3 text-center">
+              <p className="text-red-300 font-bold">⏰ ¡Tiempo agotado!</p>
             </div>
-
-            <div className="bg-indigo-900 rounded-2xl p-5 mb-4 border border-indigo-700">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-bold text-yellow-300">⏱️ Temporizador <span className="text-indigo-400 text-sm font-normal">(opcional)</span></h2>
-                <button onClick={()=>setTimerActivo(t=>!t)}
-                  className={`w-14 h-7 rounded-full transition-all relative border-2 ${timerActivo ? "bg-yellow-400 border-yellow-300" : "bg-indigo-700 border-indigo-500"}`}>
-                  <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${timerActivo?"left-7":"left-0.5"}`}/>
+          )}
+          <div className="space-y-3 mb-4">
+            {q.opciones.map((op,i)=>{
+              let cls="w-full p-4 rounded-xl font-semibold text-left transition-all border-2 flex items-center gap-3 ";
+              if(mostrarResp){
+                if(i===q.correcta) cls+="bg-green-500 border-green-300 text-white";
+                else if(i===respuesta) cls+="bg-red-500 border-red-300 text-white";
+                else cls+="bg-indigo-800 border-indigo-600 text-indigo-300 opacity-60";
+              } else {
+                cls+=respuesta===i?"bg-yellow-400 border-yellow-300 text-indigo-950":"bg-indigo-800 border-indigo-600 text-white hover:border-yellow-400";
+              }
+              return (
+                <button key={i} disabled={mostrarResp||agotado}
+                  onClick={()=>{setRespuesta(i);setError("");}} className={cls}>
+                  <span className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center font-black text-sm shrink-0">
+                    {["A","B","C","D"][i]}
+                  </span>
+                  {op}
+                  {mostrarResp&&i===q.correcta&&<span className="ml-auto">✅</span>}
+                  {mostrarResp&&i===respuesta&&i!==q.correcta&&<span className="ml-auto">❌</span>}
                 </button>
-              </div>
-              {timerActivo && (
-                <div>
-                  <p className="text-indigo-300 text-sm mb-2">Segundos por pregunta: <span className="text-yellow-300 font-bold">{timerSeg}s</span></p>
-                  <input type="range" min="10" max="60" step="5" value={timerSeg} onChange={e=>setTimerSeg(Number(e.target.value))}/>
-                  <div className="flex justify-between text-xs text-indigo-400 mt-1"><span>10s</span><span>60s</span></div>
-                </div>
-              )}
-            </div>
-
-            {error && <p className="text-red-400 text-center font-semibold mb-3">{error}</p>}
-
-            <button onClick={iniciarJuego}
-              className="w-full bg-yellow-400 hover:bg-yellow-300 text-indigo-950 font-black py-4 rounded-2xl text-xl shadow-xl transition-all mb-3">
-              ¡JUGAR! 🚀
-            </button>
-            <div className="text-center">
-              <button onClick={borrarKey} className="text-indigo-500 text-xs hover:text-indigo-300 underline">
-                Cambiar clave API
-              </button>
-            </div>
-            <LogosFooter />
+              );
+            })}
           </div>
+          {mostrarResp&&(
+            <div className="bg-indigo-900 border border-indigo-600 rounded-xl p-4 mb-4 text-sm text-indigo-200">
+              <span className="font-bold text-yellow-300">💡 </span>{q.explicacion}
+            </div>
+          )}
+          {error&&<p className="text-red-400 text-center font-semibold mb-2">{error}</p>}
+          <button onClick={comprobar}
+            className="w-full bg-yellow-400 hover:bg-yellow-300 text-indigo-950 font-black py-4 rounded-2xl text-lg shadow-xl transition-all">
+            {!mostrarResp?"Comprobar ✔️":actual+1===preguntas.length?"Ver resultados 🏆":"Siguiente ➡️"}
+          </button>
         </div>
-      );
+      </div>
+    );
+  }
 
-      // ── CARGANDO ───────────────────────────────────────────────
-      if (estado === "cargando") return (
-        <div className="min-h-screen bg-indigo-950 text-white flex flex-col items-center justify-center gap-4">
-          <div className="text-6xl animate-bounce">🧠</div>
-          <div className="animate-spin w-12 h-12 border-4 border-yellow-400 border-t-transparent rounded-full"/>
-          <p className="text-yellow-300 font-bold text-lg">Preparando tu trivial…</p>
+  const pct=Math.round((puntuacion/preguntas.length)*100);
+  const emj=pct>=80?"🏆":pct>=60?"👍":pct>=40?"😅":"📚";
+  const msg=pct>=80?"¡Brillante!":pct>=60?"¡Buen trabajo!":pct>=40?"Puedes mejorar":"¡A estudiar más!";
+  return (
+    <div className="min-h-screen bg-indigo-950 text-white p-4">
+      <div className="max-w-2xl mx-auto">
+        <LogosHeader/>
+        <div className="text-center py-6">
+          <div className="text-7xl mb-2">{emj}</div>
+          <h1 className="text-4xl font-black text-yellow-300 mb-1">{msg}</h1>
+          <p className="text-2xl font-bold">{puntuacion} / {preguntas.length} · {pct}%</p>
         </div>
-      );
-
-      // ── JUGANDO ────────────────────────────────────────────────
-      if (estado === "jugando") {
-        const q = preguntas[actual];
-        const catInfo = CATEGORIAS.find(c=>c.id===q.categoria) || {emoji:"❓",label:q.categoria};
-        const grad = COLORES[q.categoria] || "from-indigo-500 to-indigo-700";
-        const agotado = timerActivo && tiempoRestante === 0;
-
-        return (
-          <div className="min-h-screen bg-indigo-950 text-white p-4">
-            <div className="max-w-2xl mx-auto">
-              <div className="flex justify-between items-center mb-2 text-sm font-bold text-indigo-300">
-                <span>Pregunta {actual+1} / {preguntas.length}</span>
-                <span className="text-yellow-300">⭐ {puntuacion}</span>
-              </div>
-              <div className="w-full bg-indigo-800 rounded-full h-3 mb-4">
-                <div className="bg-yellow-400 h-3 rounded-full transition-all" style={{width:`${(actual/preguntas.length)*100}%`}}/>
-              </div>
-
-              <div className={`bg-gradient-to-br ${grad} rounded-2xl p-5 mb-4 shadow-xl`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">{catInfo.emoji}</span>
-                    <span className="text-sm font-bold opacity-90">{catInfo.label}</span>
+        <div className="space-y-3 mb-6 max-h-96 overflow-y-auto pr-1">
+          {preguntas.map((q,i)=>{
+            const ok=historial[i]?.correcta;
+            const cat=CATEGORIAS.find(c=>c.id===q.categoria)||{emoji:"❓"};
+            return (
+              <div key={i} className={`rounded-xl p-4 border-2 ${ok?"border-green-500 bg-green-900/30":"border-red-500 bg-red-900/30"}`}>
+                <div className="flex items-start gap-2">
+                  <span className="text-lg shrink-0">{ok?"✅":"❌"}</span>
+                  <div className="text-sm">
+                    <p className="font-semibold mb-1">{cat.emoji} {q.pregunta}</p>
+                    {!ok&&historial[i]?.respuesta>=0&&<p className="text-red-300">Tu respuesta: {q.opciones[historial[i].respuesta]}</p>}
+                    {!ok&&historial[i]?.respuesta<0&&<p className="text-orange-300">⏰ Tiempo agotado</p>}
+                    <p className="text-green-300">Correcta: {q.opciones[q.correcta]}</p>
                   </div>
-                  {timerActivo && !mostrarResp && <TimerCircle segundos={tiempoRestante} total={timerSeg}/>}
                 </div>
-                <p className="text-xl font-bold leading-snug mt-3">{q.pregunta}</p>
               </div>
-
-              {agotado && !mostrarResp && (
-                <div className="bg-red-900 border border-red-500 rounded-xl p-3 mb-3 text-center">
-                  <p className="text-red-300 font-bold">⏰ ¡Tiempo agotado!</p>
-                </div>
-              )}
-
-              <div className="space-y-3 mb-4">
-                {q.opciones.map((op, i) => {
-                  let cls = "w-full p-4 rounded-xl font-semibold text-left transition-all border-2 flex items-center gap-3 ";
-                  if (mostrarResp) {
-                    if (i===q.correcta)              cls += "bg-green-500 border-green-300 text-white";
-                    else if (i===respuesta)          cls += "bg-red-500 border-red-300 text-white";
-                    else                             cls += "bg-indigo-800 border-indigo-600 text-indigo-300 opacity-60";
-                  } else {
-                    cls += respuesta===i ? "bg-yellow-400 border-yellow-300 text-indigo-950" : "bg-indigo-800 border-indigo-600 text-white hover:border-yellow-400";
-                  }
-                  return (
-                    <button key={i} disabled={mostrarResp||agotado}
-                      onClick={()=>{setRespuesta(i);setError("");}} className={cls}>
-                      <span className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center font-black text-sm shrink-0">
-                        {["A","B","C","D"][i]}
-                      </span>
-                      {op}
-                      {mostrarResp && i===q.correcta && <span className="ml-auto">✅</span>}
-                      {mostrarResp && i===respuesta && i!==q.correcta && <span className="ml-auto">❌</span>}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {mostrarResp && (
-                <div className="bg-indigo-900 border border-indigo-600 rounded-xl p-4 mb-4 text-sm text-indigo-200">
-                  <span className="font-bold text-yellow-300">💡 </span>{q.explicacion}
-                </div>
-              )}
-              {error && <p className="text-red-400 text-center font-semibold mb-2">{error}</p>}
-
-              <button onClick={comprobar}
-                className="w-full bg-yellow-400 hover:bg-yellow-300 text-indigo-950 font-black py-4 rounded-2xl text-lg shadow-xl transition-all">
-                {!mostrarResp ? "Comprobar ✔️" : actual+1===preguntas.length ? "Ver resultados 🏆" : "Siguiente ➡️"}
-              </button>
-            </div>
-          </div>
-        );
-      }
-
-      // ── RESULTADOS ─────────────────────────────────────────────
-      const pct  = Math.round((puntuacion/preguntas.length)*100);
-      const emj  = pct>=80?"🏆":pct>=60?"👍":pct>=40?"😅":"📚";
-      const msg  = pct>=80?"¡Brillante!":pct>=60?"¡Buen trabajo!":pct>=40?"Puedes mejorar":"¡A estudiar más!";
-
-      return (
-        <div className="min-h-screen bg-indigo-950 text-white p-4">
-          <div className="max-w-2xl mx-auto">
-            <LogosHeader />
-            <div className="text-center py-6">
-              <div className="text-7xl mb-2">{emj}</div>
-              <h1 className="text-4xl font-black text-yellow-300 mb-1">{msg}</h1>
-              <p className="text-2xl font-bold">{puntuacion} / {preguntas.length} · {pct}%</p>
-            </div>
-            <div className="space-y-3 mb-6 max-h-96 overflow-y-auto pr-1">
-              {preguntas.map((q,i) => {
-                const ok = historial[i]?.correcta;
-                const cat = CATEGORIAS.find(c=>c.id===q.categoria)||{emoji:"❓"};
-                return (
-                  <div key={i} className={`rounded-xl p-4 border-2 ${ok?"border-green-500 bg-green-900/30":"border-red-500 bg-red-900/30"}`}>
-                    <div className="flex items-start gap-2">
-                      <span className="text-lg shrink-0">{ok?"✅":"❌"}</span>
-                      <div className="text-sm">
-                        <p className="font-semibold mb-1">{cat.emoji} {q.pregunta}</p>
-                        {!ok && historial[i]?.respuesta>=0 && <p className="text-red-300">Tu respuesta: {q.opciones[historial[i].respuesta]}</p>}
-                        {!ok && historial[i]?.respuesta<0  && <p className="text-orange-300">⏰ Tiempo agotado</p>}
-                        <p className="text-green-300">Correcta: {q.opciones[q.correcta]}</p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            <button onClick={reiniciar}
-              className="w-full bg-yellow-400 hover:bg-yellow-300 text-indigo-950 font-black py-4 rounded-2xl text-xl shadow-xl transition-all">
-              Jugar otra vez 🔄
-            </button>
-            <LogosFooter />
-          </div>
+            );
+          })}
         </div>
-      );
-    }
+        <button onClick={reiniciar}
+          className="w-full bg-yellow-400 hover:bg-yellow-300 text-indigo-950 font-black py-4 rounded-2xl text-xl shadow-xl transition-all">
+          Jugar otra vez 🔄
+        </button>
+        <LogosFooter/>
+      </div>
+    </div>
+  );
+}
 
-    ReactDOM.createRoot(document.getElementById("root")).render(<Trivial />);
-  </script>
+ReactDOM.createRoot(document.getElementById("root")).render(<Trivial/>);
+</script>
 </body>
 </html>
