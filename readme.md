@@ -2,7 +2,7 @@
 
 ![Logos institucionales](logo.png)
 
-# 🧠 TRIVIAL 2º ESO
+# 🧠 TRIVIAL 2.º ESO
 ### *Aprende jugando. Juega limpio.*
 
 <br/>
@@ -20,11 +20,13 @@
 
 **Trivial 2.º ESO** es una aplicación web educativa de preguntas y respuestas generadas en tiempo real por Inteligencia Artificial, diseñada específicamente para el alumnado de **2.º curso de Educación Secundaria Obligatoria**.
 
-Cada partida es única: la IA crea preguntas nuevas, adaptadas al nivel y a las materias seleccionadas, con explicaciones pedagógicas tras cada respuesta. No hay dos juegos iguales.
+Cada partida es única: las preguntas se seleccionan aleatoriamente de un banco elaborado para el nivel, con explicaciones pedagógicas tras cada respuesta. No hay dos juegos iguales.
 
 ```
 ✅ Sin instalación    ✅ Sin registro    ✅ Funciona en cualquier navegador
 ```
+
+🎮 **[Jugar ahora →](https://cite-steam-sanjoseba.github.io/trivial_2eso/)**
 
 ---
 
@@ -53,6 +55,8 @@ Una de las apuestas más importantes de este proyecto es romper los compartiment
 | 📖 Humanidades | Lengua y Literatura, Inglés, Arte y Música |
 
 Una misma partida puede llevar al alumnado de una ecuación a un poema, y de ahí a un río europeo o a una nota musical. Eso es pensar de forma **integrada**, que es como funciona el mundo real.
+
+> *¿Por qué separar lo que la vida une?*
 
 ---
 
@@ -131,7 +135,7 @@ El proyecto CITE-STEAM explora la integración de la Inteligencia Artificial y l
 <div align="center">
 
 **Cristina Ramos García**
-*Profesora de Matemáticas. ITED · IES San José, Badajoz*
+*Profesora de Matemáticas, ITED · IES San José, Badajoz*
 *Coordinadora del proyecto CITE-STEAM*
 
 
@@ -143,5 +147,5 @@ El proyecto CITE-STEAM explora la integración de la Inteligencia Artificial y l
 ---
 
 <div align="center">
-<sub>IES San José · Badajoz · 2026</sub>
+<sub>Hecho con 🧠 IA + ❤️ docencia · IES San José · Badajoz · 2026</sub>
 </div>
