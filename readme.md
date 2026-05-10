@@ -54,8 +54,6 @@ Una de las apuestas más importantes de este proyecto es romper los compartiment
 
 Una misma partida puede llevar al alumnado de una ecuación a un poema, y de ahí a un río europeo o a una nota musical. Eso es pensar de forma **integrada**, que es como funciona el mundo real.
 
-> *¿Por qué separar lo que la vida une?*
-
 ---
 
 ## 🕊️ Día Mundial del Juego Limpio — 19 de mayo
