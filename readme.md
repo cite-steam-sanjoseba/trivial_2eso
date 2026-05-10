@@ -133,10 +133,9 @@ El proyecto CITE-STEAM explora la integración de la Inteligencia Artificial y l
 <div align="center">
 
 **Cristina Ramos García**
-*Profesora de Matemáticas, Física, Biología y Geología · IES San José, Badajoz*
-*Coordinadora TIC · Responsable del proyecto CITE-STEAM*
+*Profesora de Matemáticas. ITED · IES San José, Badajoz*
+*Coordinadora del proyecto CITE-STEAM*
 
-[🌐 cienciasymates.com](https://cienciasymates.com) · [💻 github.com/cmramosg01](https://github.com/cmramosg01)
 
 © 2026 · Licencia [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es)
 *Puedes usar y adaptar este recurso con fines educativos no comerciales citando la autoría.*
@@ -146,5 +145,5 @@ El proyecto CITE-STEAM explora la integración de la Inteligencia Artificial y l
 ---
 
 <div align="center">
-<sub>Hecho con 🧠 IA + ❤️ docencia · IES San José · Badajoz · 2026</sub>
+<sub>IES San José · Badajoz · 2026</sub>
 </div>
